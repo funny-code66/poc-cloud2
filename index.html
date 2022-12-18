@@ -8,29 +8,58 @@
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
+  <header>
+    <script>
+  
+      function onClickBtnDoc () {
+        var FormBody = {}
+        FormBody.Content=document.getElementById("content_area").value
+        fetch('http://localhost:3000/doc', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(FormBody),
+        }).then((res)=>console.log(res))
+        // alert(content)
+      }
+      function onClickBtnPdf () {
+        var FormBody = {}
+        FormBody.Content=document.getElementById("content_area").value
+        fetch('http://localhost:3000/pdf', {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        }).then((res)=>console.log(res))
+        // alert(content)
+      }
+    </script>
+  </header>
+
   <main>
-    <header>
-      <a class="logo" href="/">News Demo</a>
-      <form action="/search" method="GET">
-        <input
-          autofocus
-          class="search-input"
-          valule=""
-          placeholder="Entera news topic"
-          type="search"
-          name="q"
-        />
-      </form>
-      
-    </header>
-    <button
-        href="https://github.com/freshman-tech/news"
-        class="button github-button"
-      >Make a Google Doc</a>
-    <button
-      href="https://github.com/freshman-tech/news"
-      class="button github-button"
-    >Create PDF</a>
+    <div class="container">
+      <div class="row">
+        <textarea id="content_area" name="content_area" rows="4" cols="100" ></textarea>
+      </div>
+      <div class="row">
+        <button
+          id="btn-doc"
+          class="btn-primary col-xl-5 col-lg-5 col-md-5 col-sm-12"
+          onclick="onClickBtnDoc()"
+        >Make a Google Doc</button>
+        <button
+          id="btn-pdf"
+          onclick="onClickBtnPdf()"
+          class="btn-primary col-xl-5 col-lg-5 col-md-5 col-sm-12"
+        >Create PDF</button>
+      </div>
+    </div>
   </main>
+  <footer>
+    <p>{{.Date}}</p>
+    <p>{{.Time}}</p>
+  </footer>
+  
 </body>
 </html>

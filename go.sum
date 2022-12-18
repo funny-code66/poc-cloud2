@@ -1,2 +1,5 @@
+github.com/freshman-tech/news-demo v0.0.0-20201226085618-d28e34153fe9 h1:igKvN0fDgk45oq+fOUzV8r8OYZiFm6e+i3Ve61zPXc4=
+github.com/freshman-tech/news-demo v0.0.0-20201226085618-d28e34153fe9/go.mod h1:kFgk/CZE1reBVnGA996zbdwbs7Hnjo+5/u0XvbNrKpE=
+github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
 github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
 github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
