@@ -13,6 +13,7 @@
   
       function onClickBtnDoc () {
         var FormBody = {}
+        FormBody.Title=document.getElementById("title_text").value
         FormBody.Content=document.getElementById("content_area").value
         fetch('http://localhost:3000/doc', {
           method: "POST",
@@ -40,6 +41,11 @@
   <main>
     <div class="container">
       <div class="row">
+        <h2 class="col-xl-12 col-lg-12 col-md-12 col-sm-12">Title</h2>
+        <input type="text" id="title_text" name="title_text"/>
+      </div>
+      <div class="row">
+        <h2 class="col-xl-12 col-lg-12 col-md-12 col-sm-12">Content</h2>
         <textarea id="content_area" name="content_area" rows="4" cols="100" ></textarea>
       </div>
       <div class="row">

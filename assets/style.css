@@ -42,7 +42,7 @@ main {
 
 textarea {
   padding: 20px;
-  margin: 100px 10px 30px 10px;
+  margin: 30px 10px 30px 10px;
 }
 
 @media (min-width: 1200px){
