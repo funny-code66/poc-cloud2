@@ -1,35 +1,36 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
-	"encoding/json"
 
 	"github.com/joho/godotenv"
 )
 
 type PageVariables struct {
-	Date         string
-	Time         string
+	Date string
+	Time string
 }
 
 type TxData struct {
-	Content    string
+	Title   string
+	Content string
 }
 
 var tpl = template.Must(template.ParseFiles("index.html"))
 
 func docHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("doc handler")
-	now := time.Now() // find the time right now
+	now := time.Now()              // find the time right now
 	HomePageVars := PageVariables{ //store the date and time in a struct
 		Date: now.Format("02-01-2006"),
 		Time: now.Format("15:04:05"),
 	}
-	log.Println("get fetch: %v", r.Body)
+	log.Printf("get fetch: %v", r.Body)
 	var t TxData
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&t)
@@ -37,7 +38,8 @@ func docHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("get fetch: %v", t)
+	log.Printf("Title: %s", t.Title)
+	log.Printf("Content: %s", t.Content)
 
 	// w.Write([]byte("<h1>Hello World!</h1>"))
 	tpl.Execute(w, HomePageVars)
@@ -63,7 +65,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Write([]byte("<h1>Hello World!</h1>"))
 	tpl.Execute(w, nil)
 }
-
 
 func main() {
 	err := godotenv.Load()
