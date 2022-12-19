@@ -22,7 +22,7 @@
           },
           body: JSON.stringify(FormBody),
         }).then((res)=>console.log(res))
-        // alert(content)
+        alert(content)
       }
       function onClickBtnPdf () {
         var FormBody = {}
@@ -41,11 +41,11 @@
   <main>
     <div class="container">
       <div class="row">
-        <h2 class="col-xl-12 col-lg-12 col-md-12 col-sm-12">Title</h2>
+        <div class="title col-xl-12 col-lg-12 col-md-12 col-sm-12">Title</div>
         <input type="text" id="title_text" name="title_text"/>
       </div>
       <div class="row">
-        <h2 class="col-xl-12 col-lg-12 col-md-12 col-sm-12">Content</h2>
+        <div class="title col-xl-12 col-lg-12 col-md-12 col-sm-12">Content</div>
         <textarea id="content_area" name="content_area" rows="4" cols="100" ></textarea>
       </div>
       <div class="row">

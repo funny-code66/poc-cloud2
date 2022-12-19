@@ -31,7 +31,13 @@ button {
   border: 0px;
 }
 
+.title {
+  font-size: 20px;
+  color: gray;
+}
+
 main {
+  margin: 100px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -40,6 +46,7 @@ main {
   align-items: center;
 }
 
+.title-text,
 textarea {
   padding: 20px;
   margin: 30px 10px 30px 10px;
