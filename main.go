@@ -63,6 +63,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// 	Time: now.Format("15:04:05"),
 	// }
 	// w.Write([]byte("<h1>Hello World!</h1>"))
+
 	tpl.Execute(w, nil)
 }
 
@@ -73,7 +74,7 @@ func main() {
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "3001"
 	}
 
 	fs := http.FileServer(http.Dir("assets"))

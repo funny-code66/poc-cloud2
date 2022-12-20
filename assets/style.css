@@ -19,6 +19,17 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
 }
 
+.navbar {
+  margin: 15px;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.navbar-userinfo {
+  height: 40px;
+  margin: 10px 30px 10px 30px;
+  color: white;
+}
 
 button {
   margin: 20px;
@@ -29,6 +40,12 @@ button {
   background-color: rgb(13,110,253)!important;
   color: white;
   border: 0px;
+}
+
+.authorize_button,
+.signout_button {
+  margin: 10px 30px 10px 30px !important;
+  padding: 10px;
 }
 
 .title {
