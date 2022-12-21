@@ -20,7 +20,7 @@ import (
 
 // Scopes: OAuth 2.0 scopes provide a way to limit the amount of access that is granted to an access token.
 var googleOauthConfig = &oauth2.Config{
-	RedirectURL:  "http://127.0.0.1:8000/auth/google/callback/",
+	RedirectURL:  "http://127.0.0.1:3001/auth/google/callback/",
 	ClientID:     "284873503032-3apt2hr48dn75oql589h6g1tui3f79ih.apps.googleusercontent.com",
 	ClientSecret: "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",
 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
@@ -28,6 +28,8 @@ var googleOauthConfig = &oauth2.Config{
 }
 
 const oauthGoogleUrlAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
+
+var email="NoUser"
 
 func oauthGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	log.Println("----------------oauthGoogleLogin()")
@@ -73,7 +75,19 @@ func oauthGoogleCallback(w http.ResponseWriter, r *http.Request) {
 				"picture": "https://lh3.googleusercontent.com/a-/*********************************"
 			}
 	*/
-	fmt.Fprintf(w, "UserInfo: %s\n", data)
+	log.Printf("UserInfo: %s\n", data)
+	
+	var HomePageVars PageVariables
+	err = json.Unmarshal(data, &HomePageVars)
+	
+	if err != nil {
+		fmt.Println("Can;t unmarshal the byte array")
+		return
+	}
+	email = HomePageVars.Email
+	tpl.Execute(w, HomePageVars)
+	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+
 }
 
 func generateStateOauthCookie(w http.ResponseWriter) string {
@@ -108,8 +122,9 @@ func getUserDataFromGoogle(code string) ([]byte, error) {
 }
 
 type PageVariables struct {
-	Date string
-	Time string
+	Email string
+	Date  string
+	Time  string
 }
 
 type TxData struct {
@@ -123,8 +138,9 @@ func docHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("doc handler")
 	now := time.Now()              // find the time right now
 	HomePageVars := PageVariables{ //store the date and time in a struct
-		Date: now.Format("02-01-2006"),
-		Time: now.Format("15:04:05"),
+		Email: "NoUser",
+		Date:  now.Format("02-01-2006"),
+		Time:  now.Format("15:04:05"),
 	}
 	log.Printf("get fetch: %v", r.Body)
 	var t TxData
@@ -148,19 +164,20 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 	// 	Date: now.Format("02-01-2006"),
 	// 	Time: now.Format("15:04:05"),
 	// }
-	w.Write([]byte("<h1>Hello World!</h1>"))
+	w.Write([]byte(email))
 	// tpl.Execute(w, HomePageVars)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// now := time.Now() // find the time right now
-	// HomePageVars := PageVariables{ //store the date and time in a struct
-	// 	Date: now.Format("02-01-2006"),
-	// 	Time: now.Format("15:04:05"),
-	// }
+	now := time.Now()              // find the time right now
+	HomePageVars := PageVariables{ //store the date and time in a struct
+		Email: "NoUser",
+		Date:  now.Format("02-01-2006"),
+		Time:  now.Format("15:04:05"),
+	}
 	// w.Write([]byte("<h1>Hello World!</h1>"))
 
-	tpl.Execute(w, nil)
+	tpl.Execute(w, HomePageVars)
 }
 
 func main() {
@@ -170,7 +187,7 @@ func main() {
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8000"
+		port = "3001"
 	}
 
 	fs := http.FileServer(http.Dir("assets"))

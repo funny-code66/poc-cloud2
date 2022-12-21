@@ -51,10 +51,11 @@ button {
 .title {
   font-size: 20px;
   color: gray;
+  margin-top: 20px;
 }
 
 main {
-  margin: 100px;
+  margin: 45px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -65,8 +66,8 @@ main {
 
 .title-text,
 textarea {
-  padding: 20px;
-  margin: 30px 10px 30px 10px;
+  padding: 15px;
+  margin: 10px;
 }
 
 @media (min-width: 1200px){

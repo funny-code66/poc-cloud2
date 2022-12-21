@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>News App Demo</title>
+  <title>Proof of Concept</title>
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
@@ -13,32 +13,37 @@
   
       function onClickBtnDoc () {
         var FormBody = {}
-        FormBody.Title=document.getElementById("title_text").value
+        FormBody.Title=document.getElementById("title_area").value
         FormBody.Content=document.getElementById("content_area").value
-        fetch('http://localhost:3000/doc', {
+        console.log(JSON.stringify(FormBody))
+        fetch('http://localhost:3001/doc', {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify(FormBody),
         }).then((res)=>console.log(res))
-        alert(FormBody.Content)
+        .catch(console.log)
+        createNewDoc()
+        // alert(FormBody.Content)
       }
       function onClickBtnPdf () {
-        var FormBody = {}
-        FormBody.Content=document.getElementById("content_area").value
-        fetch('http://localhost:3000/pdf', {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          },
-        }).then((res)=>console.log(res))
+        // var FormBody = {}
+        // FormBody.Content=document.getElementById("content_area").value
+        // fetch('http://localhost:3001/pdf', {
+        //   method: "GET",
+        //   headers: {
+        //     "Content-Type": "application/json"
+        //   },
+        // }).then((res)=>console.log(res))
         // alert(content)
+        createNewPDF()
       }
     </script>
       <div class="navbar row">
-        <div class="navbar-userinfo">No User</div>
-        <button class="btn-primary authorize_button" id="authorize_button" ><a href="/auth/google/login">Sign In</a></button>
+        <div class="navbar-userinfo"></div>
+        <!-- <div class="navbar-userinfo">{{.Email}}</div> -->
+        <button class="btn-primary authorize_button" id="authorize_button" onclick="handleAuthClick()"><a >Sign In</a></button>
         <button class="btn-primary signout_button" id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
       </div>
   </header>
@@ -47,7 +52,7 @@
     <div class="container">
       <div class="row">
         <div class="title col-xl-12 col-lg-12 col-md-12 col-sm-12">Title</div>
-        <input type="text" id="title_text" name="title_text"/>
+        <input type="text" class="title-text" id="title_area" name="title_area"/>
       </div>
       <div class="row">
         <div class="title col-xl-12 col-lg-12 col-md-12 col-sm-12">Content</div>
@@ -68,8 +73,8 @@
     </div>
   </main>
   <footer>
-    <p>{{.Date}}</p>
-    <p>{{.Time}}</p>
+    <!-- <p>{{.Date}}</p>
+    <p>{{.Time}}</p> -->
   </footer>
   <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
   <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
@@ -88,7 +93,7 @@
 
     // Authorization scopes required by the API; multiple scopes can be
     // included, separated by spaces.
-    const SCOPES = 'https://www.googleapis.com/auth/contacts https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/directory.readonly https://www.googleapis.com/auth/user.addresses.read https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/user.emails.read https://www.googleapis.com/auth/user.gender.read https://www.googleapis.com/auth/user.organization.read https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+    const SCOPES = 'https://www.googleapis.com/auth/documents https://www.googleapis.com/auth/documents.readonly https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
 
     let tokenClient;
     let gapiInited = false;
@@ -151,7 +156,7 @@
         }
         document.getElementById('signout_button').style.display = 'inline-block';
         document.getElementById('authorize_button').style.display = 'none';
-        await printDocTitle();
+        // await printDocTitle();
       };
 
       if (gapi.client.getToken() === null) {
@@ -163,7 +168,7 @@
         // Skip display of account chooser and consent dialog for an existing session.
         tokenClient.requestAccessToken({prompt: ''});
       }
-      document.getElementById('content_area').innerText = google.accounts.oauth2.currentUser.get()
+      // document.getElementById('content_area').innerText = google.accounts.oauth2.currentUser.get()
     }
 
     /**
@@ -175,7 +180,8 @@
         console.log(token.access_token)
         google.accounts.oauth2.revoke(token.access_token);
         gapi.client.setToken('');
-        document.getElementById('content_area').innerText = '';
+        document.getElementById('title_area').value = '';
+        document.getElementById('content_area').value = '';
         document.getElementById('authorize_button').innerText = 'Sign In';
         document.getElementById('authorize_button').style.display = 'inline-block';
         document.getElementById('signout_button').style.display = 'none';
@@ -193,11 +199,57 @@
         });
         const doc = response.result;
         const output = `Document ${doc.title} successfully found.\n`;
-        document.getElementById('content').innerText = output;
+        document.getElementById('content_area').value = output;
       } catch (err) {
-        document.getElementById('content').innerText = err.message;
+        document.getElementById('content_area').innerText = err.message;
         return;
       }
+    }
+    async function createNewDoc() {
+      let doc;
+      try {
+        const response = await gapi.client.docs.documents.create({
+          title: document.getElementById('title_area').value,
+        });
+        doc = response.result;
+        console.log("doc=>", doc)
+        window.documentId = doc.documentId
+        
+      } catch (err) {
+        console.log(err)
+        document.getElementById('content_area').innerText = err;
+        return;
+      }
+      const requests = [
+          {
+            "insertText": {
+              "text": document.getElementById('content_area').value,
+              "location": {
+                "index": 1
+              }
+            }
+          }
+        ]
+      var updateObject = {
+        documentId: window.documentId,
+        resource: {
+          requests: requests
+        },
+      };
+      try {
+        const response = await gapi.client.docs.documents.batchUpdate(updateObject);
+        console.log("response.replies=>", response.replies);
+      } catch (e) {
+        // TODO (developer) - Handle exception
+        console.log('Failed with an error %s', e.message);
+      }
+      const output = `Document '${doc.title}' successfully created.\n`;
+      document.getElementById('title_area').value = "";
+      document.getElementById('content_area').value = output;
+    }
+    
+    async function createNewPDF() {
+      console.log(gapi.client)
     }
   </script>
 </body>
