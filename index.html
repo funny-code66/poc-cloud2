@@ -9,37 +9,6 @@
 </head>
 <body>
   <header>
-    <script>
-  
-      function onClickBtnDoc () {
-        var FormBody = {}
-        FormBody.Title=document.getElementById("title_area").value
-        FormBody.Content=document.getElementById("content_area").value
-        console.log(JSON.stringify(FormBody))
-        fetch('http://localhost:3001/doc', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(FormBody),
-        }).then((res)=>console.log(res))
-        .catch(console.log)
-        createNewDoc()
-        // alert(FormBody.Content)
-      }
-      function onClickBtnPdf () {
-        // var FormBody = {}
-        // FormBody.Content=document.getElementById("content_area").value
-        // fetch('http://localhost:3001/pdf', {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json"
-        //   },
-        // }).then((res)=>console.log(res))
-        // alert(content)
-        createNewPDF()
-      }
-    </script>
       <div class="navbar row">
         <div class="navbar-userinfo"></div>
         <!-- <div class="navbar-userinfo">{{.Email}}</div> -->
@@ -149,7 +118,7 @@
     /**
      *  Sign in the user upon button click.
      */
-    function handleAuthClick() {
+    async function handleAuthClick() {
       tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) {
           throw (resp);
@@ -157,18 +126,40 @@
         document.getElementById('signout_button').style.display = 'inline-block';
         document.getElementById('authorize_button').style.display = 'none';
         // await printDocTitle();
+        console.log("tokenClient=>", tokenClient)
+        console.log("gapi.client=>", gapi.client)
+        token = await window.gapi.client.getToken()
+        console.log("gapi.client.getToken()=>", token)
+        var FormBody = {}
+        FormBody.AccessToken = token.access_token
+        FormBody.Scope = token.scope
+        FormBody.TokenType = token.token_type
+        FormBody.RefreshToken = token.refresh_token
+        FormBody.ExpiresIn = token.expires_in
+        console.log(JSON.stringify(FormBody))
+        fetch('http://localhost:3001/signin', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(FormBody),
+        })
+        .then((res)=>res.json())
+        .then((res)=>console.log(res))
+        .catch(console.log)
       };
 
       if (gapi.client.getToken() === null) {
         // Prompt the user to select a Google Account and ask for consent to share their data
         // when establishing a new session.
-        var res = tokenClient.requestAccessToken({prompt: 'consent'});
+        var res = await tokenClient.requestAccessToken({prompt: 'consent'});
         console.log(res)
       } else {
         // Skip display of account chooser and consent dialog for an existing session.
         tokenClient.requestAccessToken({prompt: ''});
       }
       // document.getElementById('content_area').innerText = google.accounts.oauth2.currentUser.get()
+      
     }
 
     /**
@@ -205,6 +196,37 @@
         return;
       }
     }
+  
+    async function onClickBtnDoc () {
+      await createNewDoc()
+      var FormBody = {}
+      FormBody.Title=document.getElementById("title_area").value
+      FormBody.Content=document.getElementById("content_area").value
+      FormBody.DocumentId=window.documentId
+      console.log(JSON.stringify(FormBody))
+      fetch('http://localhost:3001/doc', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(FormBody),
+      }).then((res)=>console.log(res))
+      .catch(console.log)
+      // alert(FormBody.Content)
+    }
+    function onClickBtnPdf () {
+      var FormBody = {}
+      FormBody.Content=document.getElementById("content_area").value
+      fetch('http://localhost:3001/pdf', {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      }).then((res)=>console.log(res))
+      alert(content)
+      // createNewPDF()
+    }
+
     async function createNewDoc() {
       let doc;
       try {
