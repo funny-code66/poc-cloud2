@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
+	// "io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -222,14 +222,14 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 	// 	Date: now.Format("02-01-2006"),
 	// 	Time: now.Format("15:04:05"),
 	// }
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	// process the credential file
-	credential, err := ioutil.ReadFile("credentials.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-		w.Write([]byte("{'res':'Unable to read client secret file'}"))
-	}
+	// // process the credential file
+	// credential, err := ioutil.ReadFile("credentials.json")
+	// if err != nil {
+	// 	log.Fatalf("Unable to read client secret file: %v", err)
+	// 	w.Write([]byte("{'res':'Unable to read client secret file'}"))
+	// }
 
 	// In order for POST upload attachment to work
 	// You need to authorize the Gmail API v1 scope
@@ -241,13 +241,13 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 
 	// See the rest at https://godoc.org/google.golang.org/api/drive/v3#pkg-constants
 
-	config, err := google.ConfigFromJSON(credential, drive.DriveScope)
-	if err != nil {
-		// log.Fatalf("Unable to parse client secret file to config: %v", err)
-		w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
-	}
+	// config, err := google.ConfigFromJSON(credential, drive.DriveScope)
+	// if err != nil {
+	// 	// log.Fatalf("Unable to parse client secret file to config: %v", err)
+	// 	w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
+	// }
 
-	client := config.Client(ctx, &token)
+	// client := config.Client(ctx, &token)
 
 	// // initiate a new Google Drive service
 	// driveClientService, err := drive.New(client)
@@ -273,7 +273,6 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 	// defer file.Close()
 	// _, err = io.Copy(file, res.Body)
 
-	srv, err := script.NewService(ctx, option.WithHTTPClient(client))
 	w.Write([]byte(email))
 	// tpl.Execute(w, HomePageVars)
 }
@@ -400,7 +399,7 @@ func savePdf() {
 	credential, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
-		w.Write([]byte("{'res':'Unable to read client secret file'}"))
+		// w.Write([]byte("{'res':'Unable to read client secret file'}"))
 	}
 
 	// In order for POST upload attachment to work
@@ -415,8 +414,8 @@ func savePdf() {
 
 	config, err := google.ConfigFromJSON(credential, drive.DriveScope)
 	if err != nil {
-		// log.Fatalf("Unable to parse client secret file to config: %v", err)
-		w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
+		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		// w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
 	}
 
 	client := config.Client(ctx, &token)
@@ -452,7 +451,7 @@ func savePdf() {
 			log.Fatalf("The API returned an error: %v", err)
 	}
 	log.Printf("https://script.google.com/d/%v/edit", updateContentRes.ScriptId)
-	w.Write([]byte(email))
+	// w.Write([]byte(email))
 	// tpl.Execute(w, HomePageVars)
 }
 
