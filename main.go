@@ -21,14 +21,15 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
-
+	"google.golang.org/api/script/v1"
+	"google.golang.org/api/option"
 )
 
 // Scopes: OAuth 2.0 scopes provide a way to limit the amount of access that is granted to an access token.
 var googleOauthConfig = &oauth2.Config{
-	RedirectURL:  "http://127.0.0.1:3001/auth/google/callback/",
-	ClientID:     "284873503032-3apt2hr48dn75oql589h6g1tui3f79ih.apps.googleusercontent.com",
-	ClientSecret: "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",
+	RedirectURL:  "https://hello-6omskd6wtq-uc.a.run.app/auth/google/callback/",
+	ClientID:     "1099511269269-r56cpc4d50c2dqru4skald614ebea3dk.apps.googleusercontent.com",
+	ClientSecret: "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",
 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 	Endpoint:     google.Endpoint,
 }
@@ -226,7 +227,8 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 	// process the credential file
 	credential, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
-					log.Fatalf("Unable to read client secret file: %v", err)
+		log.Fatalf("Unable to read client secret file: %v", err)
+		w.Write([]byte("{'res':'Unable to read client secret file'}"))
 	}
 
 	// In order for POST upload attachment to work
@@ -241,31 +243,37 @@ func pdfHandler(w http.ResponseWriter, r *http.Request) {
 
 	config, err := google.ConfigFromJSON(credential, drive.DriveScope)
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		// log.Fatalf("Unable to parse client secret file to config: %v", err)
+		w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
 	}
 
 	client := config.Client(ctx, &token)
 
-	// initiate a new Google Drive service
-	driveClientService, err := drive.New(client)
-	if err != nil {
-		log.Fatalf("Unable to initiate new Drive client: %v", err)
-	}
+	// // initiate a new Google Drive service
+	// driveClientService, err := drive.New(client)
+	// if err != nil {
+	// 	// log.Fatalf("Unable to initiate new Drive client: %v", err)
+	// 	w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
+	// }
 
-	mimeType := "application/pdf"
-	filename := "sample.pdf"
+	// mimeType := "application/pdf"
+	// filename := "sample.pdf"
 
-	res, err := driveClientService.Files.Export(documentId, mimeType).Download()
-	if err != nil {
-			log.Fatalf("Error: %v", err)
-	}
-	fmt.Printf("File.Export Result: %v", res)
-	file, err := os.Create(filename)
-	if err != nil {
-			log.Fatalf("Error: %v", err)
-	}
-	defer file.Close()
-	_, err = io.Copy(file, res.Body)
+	// res, err := driveClientService.Files.Export(documentId, mimeType).Download()
+	// if err != nil {
+	// 	// log.Fatalf("Error: %v", err)
+	// 	w.Write([]byte("{'res':'Error: res, err := driveClientService.Files.Export(documentId, mimeType).Download()'}"))
+	// }
+	// fmt.Printf("File.Export Result: %v", res)
+	// file, err := os.Create(filename)
+	// if err != nil {
+	// 	// log.Fatalf("Error: %v", err)
+	// 	w.Write([]byte("{'res':'Error: file, err := os.Create(filename)'}"))
+	// }
+	// defer file.Close()
+	// _, err = io.Copy(file, res.Body)
+
+	srv, err := script.NewService(ctx, option.WithHTTPClient(client))
 	w.Write([]byte(email))
 	// tpl.Execute(w, HomePageVars)
 }
@@ -360,6 +368,92 @@ func saveToken(file string, token *oauth2.Token) {
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
+}
+
+
+// savePdf uses a file path to create a file and store the
+// PDF.
+func savePdf() {
+	// usr, err := user.Current()
+	// if err != nil {
+	// 	return
+	// }
+	// tokenCacheDir := filepath.Join(usr.HomeDir, ".sample")
+	// os.MkdirAll(tokenCacheDir, 0700)
+	// filepathname := filepath.Join(tokenCacheDir,
+	// 	url.QueryEscape("google-drive-golang.pdf"))
+	// fmt.Printf("Saving credential file to: %s\n", filepathname)
+	// f, err := os.Create(filepathname)
+	// if err != nil {
+	// 	log.Fatalf("Unable to cache oauth token: %v", err)
+	// }
+	// defer f.Close()
+	// json.NewEncoder(f).Encode(token)
+	// now := time.Now() // find the time right now
+	// HomePageVars := PageVariables{ //store the date and time in a struct
+	// 	Date: now.Format("02-01-2006"),
+	// 	Time: now.Format("15:04:05"),
+	// }
+	ctx := context.Background()
+
+	// process the credential file
+	credential, err := ioutil.ReadFile("credentials.json")
+	if err != nil {
+		log.Fatalf("Unable to read client secret file: %v", err)
+		w.Write([]byte("{'res':'Unable to read client secret file'}"))
+	}
+
+	// In order for POST upload attachment to work
+	// You need to authorize the Gmail API v1 scope
+	// at https://developers.google.com/oauthplayground/
+	// otherwise you will get Authorization error in the API JSON reply
+
+	// Use DriveScope for this example. Because of we want to Manage the files in
+	// Google Drive.
+
+	// See the rest at https://godoc.org/google.golang.org/api/drive/v3#pkg-constants
+
+	config, err := google.ConfigFromJSON(credential, drive.DriveScope)
+	if err != nil {
+		// log.Fatalf("Unable to parse client secret file to config: %v", err)
+		w.Write([]byte("{'res':'Unable to initiate new Drive client'}"))
+	}
+
+	client := config.Client(ctx, &token)
+
+	srv, err := script.NewService(ctx, option.WithHTTPClient(client))
+		if err != nil {
+			log.Fatalf("Unable to retrieve Script client: %v", err)
+	}
+
+	req := script.CreateProjectRequest{Title: "My Script"}
+	createRes, err := srv.Projects.Create(&req).Do()
+	if err != nil {
+			// The API encountered a problem.
+			log.Fatalf("The API returned an error: %v", err)
+	}
+	content := &script.Content{
+			ScriptId: createRes.ScriptId,
+			Files: []*script.File{{
+							Name:   "hello",
+							Type:   "SERVER_JS",
+							Source: "function helloWorld() {\n  console.log('Hello, world!');}",
+			}, {
+							Name: "appsscript",
+							Type: "JSON",
+							Source: "{\"timeZone\":\"America/New_York\",\"exceptionLogging\":" +
+											"\"CLOUD\"}",
+			}},
+	}
+	updateContentRes, err := srv.Projects.UpdateContent(createRes.ScriptId,
+			content).Do()
+	if err != nil {
+			// The API encountered a problem.
+			log.Fatalf("The API returned an error: %v", err)
+	}
+	log.Printf("https://script.google.com/d/%v/edit", updateContentRes.ScriptId)
+	w.Write([]byte(email))
+	// tpl.Execute(w, HomePageVars)
 }
 
 func main() {
