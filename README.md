@@ -1,6 +1,6 @@
 # Proof of Concept Diary.
 
-An website built with Go. Tutorial:
+An website built with Go. Tutorial: Go on
 https://freshman.tech/web-development-with-go/
 
 Here's what the [completed application](https://hello-6omskd6wtq-uc.a.run.app/)
